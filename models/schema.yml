@@ -1,0 +1,13 @@
+version: 1
+
+sources:
+  - name: raw
+    database: transformed-data-455317
+    schema: sharepoint_spinmaster
+    tables:
+      - name: fin_data_sheet_1
+        description: "Financial records by brand and region from 2019–2021"
+      - name: pos
+        description: "Weekly point-of-sale data reported by retailers"
+      - name: shipment
+        description: "Shipment records with FOB/DOM types and lead times"

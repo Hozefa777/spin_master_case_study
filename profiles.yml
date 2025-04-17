@@ -1,0 +1,10 @@
+spin_master_case_study:
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: transformed-data-455317
+      threads: 4
+      timeout_seconds: 300
+      location: US                     
+  target: dev
