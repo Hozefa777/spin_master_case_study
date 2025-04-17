@@ -1,12 +1,15 @@
 SELECT
-    CAST(year AS INT64) AS year,
-    CAST(month AS INT64) AS month,
-    CAST(week AS INT64) AS week,
-    DATE_FROM_ISOWEEK(CAST(year AS INT64), CAST(week AS INT64)) AS week_date,
-    LOWER(region) AS region,
     retailer_code,
-    LOWER(retailer_name) AS retailer_name,
     brand_code,
+    CAST(year AS INT64) AS year,
+    EXTRACT(MONTH FROM PARSE_DATE('%G-%V', CAST(year AS STRING) || '-' || LPAD(CAST(week AS STRING), 2, '0'))) AS month,
+    CAST(week AS INT64) AS week,
+    PARSE_DATE(
+        '%G-%V',
+        CAST(year AS STRING) || '-' || LPAD(CAST(week AS STRING), 2, '0')
+    ) AS week_date,
+    LOWER(region) AS region,
+    LOWER(retailer_name) AS retailer_name,
     LOWER(brand) AS brand,
     SAFE_CAST(pos_units AS INT64) AS pos_units,
     SAFE_CAST(pos_amount AS FLOAT64) AS pos_amount,
