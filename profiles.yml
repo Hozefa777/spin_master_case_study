@@ -4,6 +4,7 @@ spin_master_case_study:
       type: bigquery
       method: oauth
       project: transformed-data-455317
+      dataset: sharepoint_spinmaster
       threads: 4
       timeout_seconds: 300
       location: US                     

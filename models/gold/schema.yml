@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: fct_finance
+    description: >
+      Final finance metrics aggregated by year, month, version, region, and brand.
+      Includes GPS, NPS, Revenue, and GM calculations.
+    columns:
+      - name: year
+        tests: [not_null]
+      - name: month
+        tests: [not_null]
+      - name: version
+      - name: region
+      - name: brand
+      - name: gps
+      - name: allowance
+      - name: other_revenue
+      - name: cogs
+      - name: nps
+        description: "Net sales after allowance: gps - allowance"
+      - name: revenue
+        description: "Total revenue: nps + other revenue"
+      - name: gm
+        description: "Gross margin: revenue - cogs"
+
+  - name: fct_inventory
+    description: >
+      Weekly inventory projection per retailer and brand using cumulative
+      landed shipments and POS units. Includes projected future inventory.
+    columns:
+      - name: week_date
+        tests: [not_null]
+      - name: retailer_code
+        tests: [not_null]
+      - name: brand
+        tests: [not_null]
+      - name: pos_units
+      - name: landed_units
+      - name: ending_inventory
+        description: "Projected inventory after cumulative net flow (shipments - POS)"

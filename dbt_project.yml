@@ -34,4 +34,11 @@ models:
     bronze:
       +materialized: table
       +schema: sharepoint_spinmaster
+    silver:
+      +materialized: view
+      +schema: sharepoint_spinmaster
+    gold:
+      +materialized: table
+      +schema: sharepoint_spinmaster
+
     

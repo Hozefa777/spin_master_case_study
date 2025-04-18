@@ -1,6 +1,4 @@
-
-
-select
+SELECT
     year,
     month,
     week,
@@ -13,5 +11,5 @@ select
     pos_amount,
     inv_units,
     inv_amount
-from
+FROM
     {{ source("raw", "pos") }}
