@@ -1,5 +1,4 @@
-
-select
+SELECT
     year,
     month,
     week,
@@ -11,5 +10,5 @@ select
     brand,
     shp_units,
     shp_amount
-from
+FROM
     {{ source("raw", "shipment") }}

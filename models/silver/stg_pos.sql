@@ -2,7 +2,12 @@ SELECT
     retailer_code,
     brand_code,
     CAST(year AS INT64) AS year,
-    EXTRACT(MONTH FROM PARSE_DATE('%G-%V', CAST(year AS STRING) || '-' || LPAD(CAST(week AS STRING), 2, '0'))) AS month,
+    EXTRACT(
+        MONTH FROM PARSE_DATE(
+            '%G-%V',
+            CAST(year AS STRING) || '-' || LPAD(CAST(week AS STRING), 2, '0')
+        )
+    ) AS month,
     CAST(week AS INT64) AS week,
     PARSE_DATE(
         '%G-%V',
