@@ -1,27 +1,35 @@
-WITH finance_clean AS (
-    SELECT *
-    FROM {{ ref('stg_finance') }}
-),
-
-
-pivoted AS (
+WITH base AS (
     SELECT
         year,
         month,
-        version,
-        region,
-        brand,
-        SUM(CASE WHEN node = 'gps' THEN amount ELSE 0 END) AS gps,
-        SUM(CASE WHEN node = 'allowance' THEN amount ELSE 0 END) AS allowance,
-        SUM(CASE WHEN node = 'other revenue' THEN amount ELSE 0 END) AS other_revenue,
-        SUM(CASE WHEN node = 'cogs' THEN amount ELSE 0 END) AS cogs
-    FROM finance_clean
-    GROUP BY year, month, version, region, brand
+        LOWER(version) AS type,
+        LOWER(region) AS region,
+        LOWER(brand) AS brand,
+        LOWER(node) AS node,
+        SAFE_CAST(amount AS FLOAT64) AS amount
+    FROM {{ ref('stg_finance') }}
+),
+
+metrics AS (
+    SELECT
+        *,
+        MAX(CASE WHEN node = 'gps' THEN amount ELSE 0 END) OVER (PARTITION BY year, month, type, region, brand) AS gps_amount,
+        MAX(CASE WHEN node = 'allowance' THEN amount ELSE 0 END) OVER (PARTITION BY year, month, type, region, brand) AS allowance_amount,
+        MAX(CASE WHEN node = 'other revenue' THEN amount ELSE 0 END) OVER (PARTITION BY year, month, type, region, brand) AS other_revenue_amount,
+        MAX(CASE WHEN node = 'cogs' THEN amount ELSE 0 END) OVER (PARTITION BY year, month, type, region, brand) AS cogs_amount
+    FROM base
 )
 
 SELECT
-    *,
-    gps - allowance AS nps,
-    (gps - allowance + other_revenue) AS revenue,
-    (gps - allowance + other_revenue - cogs) AS gm
-FROM pivoted
+    year,
+    month,
+    type,
+    region,
+    brand,
+    node,
+    amount,
+    gps_amount,
+    gps_amount - allowance_amount AS nps_amount,
+    gps_amount - allowance_amount + other_revenue_amount AS revenue,
+    gps_amount - allowance_amount + other_revenue_amount - cogs_amount AS gm
+FROM metrics
