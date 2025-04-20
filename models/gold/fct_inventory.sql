@@ -62,6 +62,12 @@ with_projection AS (
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ) AS last_known_inventory,
 
+        MAX(inv_amount) OVER (
+            PARTITION BY c.retailer_code, c.brand
+            ORDER BY c.week_date
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS last_known_inventory_amount,
+
         SUM(
             CASE
                 WHEN c.week_date > lp.last_pos_week_date THEN IFNULL(landed_units, 0)
@@ -71,7 +77,18 @@ with_projection AS (
             PARTITION BY c.retailer_code, c.brand
             ORDER BY week_date
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-        ) AS cumulative_landed_after_pos
+        ) AS cumulative_landed_after_pos,
+
+        SUM(
+            CASE
+                WHEN c.week_date > lp.last_pos_week_date THEN IFNULL(landed_amount, 0)
+                ELSE 0
+            END
+        ) OVER (
+            PARTITION BY c.retailer_code, c.brand
+            ORDER BY week_date
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS cumulative_landed_after_pos_amount
 
     FROM combined c
     LEFT JOIN last_pos_week lp
@@ -85,8 +102,18 @@ final AS (
             WHEN week_date > last_pos_week_date THEN
                 last_known_inventory + cumulative_landed_after_pos
             ELSE NULL
-        END AS projected_inventory_units
+        END AS projected_inventory_units,
+        CASE
+            WHEN inv_units IS NOT NULL THEN inv_amount
+            WHEN week_date > last_pos_week_date THEN
+                last_known_inventory_amount + cumulative_landed_after_pos_amount
+            ELSE NULL
+        END AS projected_inventory_amount
     FROM with_projection
+
+
+
+
 ),
 
 final_with_kpis AS (
@@ -101,22 +128,31 @@ final_with_kpis AS (
         IFNULL(landed_units, 0) AS landed_units,
         IFNULL(landed_amount, 0) AS landed_amount,
         IFNULL(projected_inventory_units, 0) AS projected_inventory_units,
+        IFNULL(projected_inventory_amount, 0) AS projected_inventory_amount,
         EXTRACT(YEAR FROM week_date) AS year,
         EXTRACT(MONTH FROM week_date) AS month,
 
         -- Month-end Inventory
         MAX(IFNULL(projected_inventory_units, 0)) OVER (
             PARTITION BY retailer_code, brand, EXTRACT(YEAR FROM week_date), EXTRACT(MONTH FROM week_date)
-        ) AS month_end_inventory,
+        ) AS month_end_inventory_units,
+        MAX(IFNULL(projected_inventory_amount, 0)) OVER (
+            PARTITION BY retailer_code, brand, EXTRACT(YEAR FROM week_date), EXTRACT(MONTH FROM week_date)
+        ) AS month_end_inventory_amount,
 
         -- Inventory Coverage
-        SAFE_DIVIDE(IFNULL(projected_inventory_units, 0), NULLIF(pos_units, 0)) AS inventory_coverage,
+        SAFE_DIVIDE(IFNULL(projected_inventory_units, 0), NULLIF(pos_units, 0)) AS inventory_coverage_units,
+        SAFE_DIVIDE(IFNULL(projected_inventory_amount, 0), NULLIF(pos_amount, 0)) AS inventory_coverage_amount,
 
         -- Sell-through Rate
         SAFE_DIVIDE(
             pos_units,
             NULLIF(pos_units + IFNULL(projected_inventory_units, 0) + IFNULL(landed_units, 0), 0)
-        ) AS sell_through_rate
+        ) AS sell_through_rate,
+                SAFE_DIVIDE(
+            pos_units,
+            NULLIF(pos_amount + IFNULL(projected_inventory_amount, 0) + IFNULL(landed_amount, 0), 0)
+        ) AS sell_through_rate_amount
 
     FROM final
 )
