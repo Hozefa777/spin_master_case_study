@@ -69,7 +69,7 @@ Dynamic metric toggles (Units/Amount)
 Visual breakdowns by brand, region, type
 
 🔗 Power BI Dashboard
-
+https://app.powerbi.com/view?r=eyJrIjoiNDM0MTNiNjQtYzQyOC00NWRmLTkwOTYtNGQ3MGI5NmE0MDZhIiwidCI6ImY1OWU3OTNhLTIzNWYtNDJhNy1iODVlLTllZWY3MjhkMTU5ZiJ9
 📁 Folder Structure
 
 ├── models
@@ -81,6 +81,5 @@ Visual breakdowns by brand, region, type
 ├── README.md
 
 📬 Contact
-
 Hozefa Ajmerwalahozefaajmerwala@gmail.com
 LinkedIn
