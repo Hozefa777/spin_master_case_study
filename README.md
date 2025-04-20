@@ -82,7 +82,8 @@ Visual breakdowns by brand, region, type
 
 📬 Contact
 
-Hozefa Ajmerwalahozefaajmerwala@gmail.com
+Hozefa Ajmerwala
+hozefa.ajmerwala@gmail.com
 LinkedIn
 
 Thank you for reviewing this project. Feedback is welcome!
