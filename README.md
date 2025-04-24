@@ -81,5 +81,6 @@ https://app.powerbi.com/view?r=eyJrIjoiNDM0MTNiNjQtYzQyOC00NWRmLTkwOTYtNGQ3MGI5N
 ├── README.md
 
 📬 Contact
-Hozefa Ajmerwalahozefaajmerwala@gmail.com
+Hozefa Ajmerwala
+hozefa.ajmerwala@gmail.com
 LinkedIn
